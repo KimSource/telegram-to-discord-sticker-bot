@@ -1,0 +1,20 @@
+{
+  "name": "telegram-to-discord-sticker-bot",
+  "version": "0.1.0",
+  "description": "Telegram bot that converts Telegram stickers into Discord stickers",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc && concurrently \"tsc -w\" \"nodemon dist/index.js\""
+  },
+  "author": "KimSource",
+  "license": "MIT",
+  "private": "true",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^16.0.1",
+    "concurrently": "^6.2.0",
+    "nodemon": "^2.0.9",
+    "typescript": "^4.3.5"
+  }
+}
