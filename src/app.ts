@@ -1,11 +1,6 @@
 import 'dotenv/config';
-import { Context, Telegraf } from 'telegraf';
-
-async function fetchFile(ctx: Context, fileId: string): Promise<any> {
-  const fileLink = await ctx.telegram.getFileLink(fileId);
-  // TODO: HTTP 요청
-  return;
-}
+import { Telegraf } from 'telegraf';
+import { fetchFile, isGzip, isWebp } from './file';
 
 export function launchBot(token: string): void {
   const bot = new Telegraf(token);
@@ -31,6 +26,8 @@ export function launchBot(token: string): void {
           (stickerFile) => {
             // TODO: 변환
             console.log(stickerFile);
+            console.log('isWebp', isWebp(stickerFile));
+            console.log('isGzip', isGzip(stickerFile));
             return stickerFile;
           },
           (err) => {
