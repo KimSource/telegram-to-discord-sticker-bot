@@ -10,7 +10,9 @@
   "author": "KimSource",
   "license": "MIT",
   "private": "true",
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  },
   "devDependencies": {
     "@types/node": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
