@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import sharp from 'sharp';
 import { Telegraf } from 'telegraf';
+import { convert as convertTgsToLottie } from 'tgs2lottie';
 import { fetchFile, isGzip, isWebp } from './file';
 
 export function launchBot(token: string): void {
@@ -23,7 +24,7 @@ export function launchBot(token: string): void {
       const fileId = ctx.message.sticker.file_id;
 
       try {
-        await fetchFile(ctx, fileId).then(
+        await fetchFile(ctx, fileId).then<string | Buffer>(
           (stickerFile) => {
             if (isWebp(stickerFile)) {
               return sharp(stickerFile)
@@ -36,8 +37,7 @@ export function launchBot(token: string): void {
                 .png()
                 .toBuffer();
             } else if (isGzip(stickerFile)) {
-              // TODO: 변환
-              throw new Error('Unsupported sticker type');
+              return convertTgsToLottie(stickerFile, 320);
             } else {
               throw new Error('Unsupported sticker type');
             }
