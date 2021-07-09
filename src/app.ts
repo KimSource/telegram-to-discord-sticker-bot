@@ -151,6 +151,10 @@ export function launchBot(token: string): void {
     return next();
   });
 
+  bot.catch((err) => {
+    console.error(err);
+  });
+
   bot.launch().then(() => {
     console.log('Telegram bot launched');
   });
