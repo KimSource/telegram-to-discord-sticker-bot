@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import sharp from 'sharp';
 import { Telegraf } from 'telegraf';
 import { fetchFile, isGzip, isWebp } from './file';
 
@@ -24,11 +25,22 @@ export function launchBot(token: string): void {
       try {
         await fetchFile(ctx, fileId).then(
           (stickerFile) => {
-            // TODO: 변환
-            console.log(stickerFile);
-            console.log('isWebp', isWebp(stickerFile));
-            console.log('isGzip', isGzip(stickerFile));
-            return stickerFile;
+            if (isWebp(stickerFile)) {
+              return sharp(stickerFile)
+                .resize({
+                  fit: sharp.fit.contain,
+                  width: 320,
+                  height: 320,
+                  background: '#0000',
+                })
+                .png()
+                .toBuffer();
+            } else if (isGzip(stickerFile)) {
+              // TODO: 변환
+              throw new Error('Unsupported sticker type');
+            } else {
+              throw new Error('Unsupported sticker type');
+            }
           },
           (err) => {
             console.error(err);
