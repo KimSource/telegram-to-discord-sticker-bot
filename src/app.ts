@@ -22,9 +22,11 @@ export function launchBot(token: string): void {
     if ('sticker' in ctx.message) {
       const replyMessage = await ctx.reply('Downloading file');
       const fileId = ctx.message.sticker.file_id;
+      const stickerId = ctx.message.sticker.file_unique_id;
+      const stickerSetName = ctx.message.sticker.set_name ?? 'Sticker';
 
       try {
-        await fetchFile(ctx, fileId).then<string | Buffer>(
+        await fetchFile(ctx, fileId).then<{ data: string | Buffer; fileName: string; }>(
           (stickerFile) => {
             if (isWebp(stickerFile)) {
               return sharp(stickerFile)
@@ -35,9 +37,18 @@ export function launchBot(token: string): void {
                   background: '#0000',
                 })
                 .png()
-                .toBuffer();
+                .toBuffer()
+                .then((data) => ({
+                  data,
+                  fileName: `${stickerSetName} ${stickerId}.png`,
+                }));
             } else if (isGzip(stickerFile)) {
-              return convertTgsToLottie(stickerFile, 320);
+              const lottie = convertTgsToLottie(stickerFile, 320);
+              const lottieJson = JSON.parse(lottie);
+              return {
+                data: lottie,
+                fileName: (lottieJson?.nm || `${stickerSetName} ${stickerId}`) + '.json',
+              };
             } else {
               throw new Error('Unsupported sticker type');
             }
@@ -47,9 +58,8 @@ export function launchBot(token: string): void {
             throw new Error('Failed to fetch the sticker');
           },
         ).then(
-          (stickerFile) => {
-            // TODO: 파일 전송
-            // ctx.replyWithDocument(stickerFile);
+          (sticker) => {
+            return ctx.replyWithDocument({ source: Buffer.from(sticker.data), filename: sticker.fileName });
           },
           (err) => {
             console.error(err);
